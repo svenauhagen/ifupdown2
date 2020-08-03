@@ -228,7 +228,6 @@ class bond(Addon, moduleBase):
         ('bond-xmit-hash-policy', Link.IFLA_BOND_XMIT_HASH_POLICY, lambda x: Link.ifla_bond_xmit_hash_policy_tbl[x]),
         ('bond-miimon', Link.IFLA_BOND_MIIMON, int),
         ('bond-arp-interval', Link.IFLA_BOND_ARP_INTERVAL, int),
-        ('bond-arp-ip-target', Link.IFLA_BOND_ARP_IP_TARGET, lambda x: [IPv4Address(ip) for ip in x]),
         ('bond-min-links', Link.IFLA_BOND_MIN_LINKS, int),
         ('bond-num-grat-arp', Link.IFLA_BOND_NUM_PEER_NOTIF, int),
         ('bond-num-unsol-na', Link.IFLA_BOND_NUM_PEER_NOTIF, int),
@@ -515,9 +514,6 @@ class bond(Addon, moduleBase):
         # if no configuration is provided we look for a config in policy files
         for attr_name, netlink_attr, func_ptr in self._bond_attr_set_list:
 
-            if attr_name in ['bond-arp-ip-target']:
-                continue
-
             cached_value        = None
             user_config         = ifaceobj.get_attr_value_first(attr_name)
 
@@ -607,8 +603,6 @@ class bond(Addon, moduleBase):
         ifla_arp_ip_target = ifaceobj.get_attr_value('bond-arp-ip-target')
         if ifla_arp_ip_target:
             ifla_arp_ip_target = [IPv4Address(ip) for ip in ifla_arp_ip_target]
-        if link_exists and ifla_arp_ip_target is None:
-            ifla_arp_ip_target = self.cache.get_link_info_data_attribute(ifaceobj.name, Link.IFLA_BOND_ARP_IP_TARGET)
 
         if ifla_arp_ip_target:
             ifla_info_data[Link.IFLA_BOND_ARP_IP_TARGET] = ifla_arp_ip_target
